@@ -1,12 +1,8 @@
-import CheckIn from "./pages/CheckIn";
+import Onboarding from "./pages/Onboarding";
 import "./App.css";
 
 function App() {
-  return (
-    <div>
-      <CheckIn />
-    </div>
-  );
+  return <Onboarding />;
 }
 
 export default App;
