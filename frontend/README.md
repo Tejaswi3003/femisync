@@ -1,62 +1,59 @@
-# Femisync Frontend
+# Femisync
 
-Frontend application for Femisync built using React, TypeScript, Vite, and Tailwind CSS.
+Femisync is an AI-powered women’s wellness platform designed to help users track daily wellness patterns, menstrual cycle symptoms, menopause-related symptoms, mood, stress, sleep, energy, and fatigue.
 
----
+The goal is not to diagnose medical conditions, but to help users understand wellness trends through tracking, analytics, and AI-generated insights.
+
+## Features
+
+- Personalized onboarding flow
+- Dynamic wellness check-in form
+- Menstrual cycle tracking mode
+- Menopause/perimenopause tracking mode
+- General wellness tracking mode
+- Mood, stress, energy, fatigue, and sleep tracking
+- Calendar date picker
+- Symptom selection
+- Notes input
+- Frontend payload aligned with backend API contract
 
 ## Tech Stack
 
+### Frontend
 - React
 - TypeScript
 - Vite
-- Tailwind CSS
+- CSS
+- React Datepicker
 
----
+### Backend
+- FastAPI
+- Python
+- Pydantic
+- Analytics/AI integration
 
-## Features Planned
-
-- Responsive wellness dashboard
-- Daily symptom check-in forms
-- Cycle tracking UI
-- Menopause/perimenopause mode
-- Analytics and trend visualizations
-- AI wellness insight cards
-- User authentication flow
-
----
-
-## Running the Frontend
-
-Install dependencies:
+## Project Structure
 
 ```bash
+femisync/
+├── backend/
+│   ├── main.py
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── App.tsx
+│   │   └── App.css
+│   └── package.json
+└── README.md
+
+
+Frontend Setup
+cd frontend
 npm install
-```
-
-Start development server:
-
-```bash
 npm run dev
-```
 
-Frontend runs at:
+Open:
 
-```text
 http://localhost:5173
-```
-
----
-
-## Build for Production
-
-```bash
-npm run build
-```
-
----
-
-## Preview Production Build
-
-```bash
-npm run preview
-```
