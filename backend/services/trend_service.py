@@ -1,0 +1,70 @@
+import pandas as pd
+
+from backend.services.checkin_service import get_raw_checkins
+
+
+def generate_trend_data(window="all"):
+    logs = get_raw_checkins()
+
+    if len(logs) == 0:
+        return {
+            "message": "No trend data available"
+        }
+
+    df = pd.DataFrame(logs)
+
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date")
+
+    if window != "all":
+        latest_date = df["date"].max()
+        cutoff_date = latest_date - pd.Timedelta(days=int(window) - 1)
+
+        df = df[df["date"] >= cutoff_date]
+
+    df["sleep_rolling_avg"] = (
+        df["sleep_hours"]
+        .rolling(window=3, min_periods=1)
+        .mean()
+        .round(2)
+    )
+
+    df["stress_rolling_avg"] = (
+        df["stress_score"]
+        .rolling(window=3, min_periods=1)
+        .mean()
+        .round(2)
+    )
+
+    df["fatigue_rolling_avg"] = (
+        df["fatigue_score"]
+        .rolling(window=3, min_periods=1)
+        .mean()
+        .round(2)
+    )
+
+    return {
+        "sleep_trend": [
+            {
+                "date": row["date"].strftime("%Y-%m-%d"),
+                "value": row["sleep_rolling_avg"]
+            }
+            for _, row in df.iterrows()
+        ],
+
+        "stress_trend": [
+            {
+                "date": row["date"].strftime("%Y-%m-%d"),
+                "value": row["stress_rolling_avg"]
+            }
+            for _, row in df.iterrows()
+        ],
+
+        "fatigue_trend": [
+            {
+                "date": row["date"].strftime("%Y-%m-%d"),
+                "value": row["fatigue_rolling_avg"]
+            }
+            for _, row in df.iterrows()
+        ]
+    }

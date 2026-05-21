@@ -3,6 +3,22 @@ import pandas as pd
 from backend.services.checkin_service import get_raw_checkins
 
 
+def filter_by_window(df, window):
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date")
+
+    if window == "all":
+        return df
+
+    if window not in ["7", "30"]:
+        return df
+
+    latest_date = df["date"].max()
+    days = int(window)
+    cutoff_date = latest_date - pd.Timedelta(days=days - 1)
+
+    return df[df["date"] >= cutoff_date]
+
 def calculate_correlation(df, x_column, y_column):
     if len(df) < 2:
         return None
@@ -32,7 +48,7 @@ def calculate_trend(df, column_name):
     else:
         return "stable"
 
-def calculate_basic_analytics():
+def calculate_basic_analytics(window="all"):
     logs = get_raw_checkins()
 
     if len(logs) == 0:
@@ -42,6 +58,7 @@ def calculate_basic_analytics():
         }
 
     df = pd.DataFrame(logs)
+    df = filter_by_window(df, window)
 
     total_entries = len(df)
 

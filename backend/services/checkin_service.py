@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from datetime import datetime
 from backend.models.wellness import WellnessCheckIn
 
 DATA_FILE = Path("backend/data/wellness_logs.json")
@@ -15,6 +16,7 @@ def write_logs(logs):
 def save_checkin(checkin: WellnessCheckIn):
     logs = read_logs()
     checkin_dict = checkin.model_dump()
+    checkin_dict["created_at"] = datetime.now().isoformat()
     logs.append(checkin_dict)
     write_logs(logs)
     return {

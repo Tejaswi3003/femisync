@@ -119,5 +119,17 @@
         "cramps_score": 3,
         "hot_flashes": 2,
         "notes": "High stress and poor sleep"
+    },
+    {
+        "date": "2026-05-20",
+        "sleep_hours": 6.5,
+        "stress_score": 7,
+        "mood_score": 4,
+        "energy_score": 3,
+        "fatigue_score": 5,
+        "cramps_score": 2,
+        "hot_flashes": 0,
+        "notes": "Felt tired today",
+        "created_at": "2026-05-21T13:52:35.911248"
     }
 ]
