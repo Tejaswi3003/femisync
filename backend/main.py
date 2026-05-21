@@ -3,6 +3,8 @@ from backend.routes.checkin import router as checkin_router
 from backend.routes.analytics import router as analytics_router
 from backend.routes.insights import router as insights_router
 from backend.routes.trends import router as trends_router
+from backend.routes.cycle import router as cycle_router
+from backend.routes.seed import router as seed_router
 
 app = FastAPI()
 
@@ -10,6 +12,8 @@ app.include_router(checkin_router)
 app.include_router(analytics_router)
 app.include_router(insights_router)
 app.include_router(trends_router)
+app.include_router(cycle_router)
+app.include_router(seed_router)
 
 @app.get("/")
 def home():

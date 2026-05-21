@@ -76,6 +76,17 @@ def calculate_basic_analytics(window="all"):
         "high_fatigue_days": int((df["fatigue_score"] >= 7).sum()),
         "cramps_days": int((df["cramps_score"] > 0).sum()),
 
+        "period_days": int((df["period_status"] == True).sum()),
+        "average_flow_intensity": round(df["flow_intensity"].mean(), 2),
+        "average_cramps": round(df["cramps_score"].mean(), 2),
+
+        "hot_flash_days": int((df["hot_flashes"] > 0).sum()),
+        "night_sweat_days": int((df["night_sweats"] > 0).sum()),
+        "sleep_disruption_days": int((df["sleep_disruption"] > 0).sum()),
+
+        "average_brain_fog": round(df["brain_fog"].mean(), 2),
+        "average_mood_swings": round(df["mood_swings"].mean(), 2),
+
         "correlations": {
             "sleep_fatigue": calculate_correlation(df, "sleep_hours", "fatigue_score"),
             "stress_mood": calculate_correlation(df, "stress_score", "mood_score"),
