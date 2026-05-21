@@ -1,0 +1,123 @@
+[
+    {
+        "date": "2026-05-20",
+        "sleep_hours": 6.5,
+        "stress_score": 7,
+        "mood_score": 4,
+        "energy_score": 3,
+        "fatigue_score": 5,
+        "cramps_score": 2,
+        "hot_flashes": 0,
+        "notes": "Felt tired today"
+    },
+    {
+        "date": "2026-05-21",
+        "sleep_hours": 6.5,
+        "stress_score": 7,
+        "mood_score": 4,
+        "energy_score": 3,
+        "fatigue_score": 5,
+        "cramps_score": 2,
+        "hot_flashes": 0,
+        "notes": "Felt tired today"
+    },
+    {
+        "date": "2026-05-22",
+        "sleep_hours": 6.5,
+        "stress_score": 7,
+        "mood_score": 4,
+        "energy_score": 3,
+        "fatigue_score": 5,
+        "cramps_score": 2,
+        "hot_flashes": 0,
+        "notes": "Felt tired today"
+    },
+    {
+        "date": "2026-05-01",
+        "sleep_hours": 8.0,
+        "stress_score": 3,
+        "mood_score": 8,
+        "energy_score": 8,
+        "fatigue_score": 2,
+        "cramps_score": 0,
+        "hot_flashes": 0,
+        "notes": "Good productive day"
+    },
+    {
+        "date": "2026-05-02",
+        "sleep_hours": 5.0,
+        "stress_score": 8,
+        "mood_score": 4,
+        "energy_score": 3,
+        "fatigue_score": 8,
+        "cramps_score": 3,
+        "hot_flashes": 0,
+        "notes": "Very stressful work day"
+    },
+    {
+        "date": "2026-05-03",
+        "sleep_hours": 6.0,
+        "stress_score": 7,
+        "mood_score": 5,
+        "energy_score": 4,
+        "fatigue_score": 7,
+        "cramps_score": 4,
+        "hot_flashes": 0,
+        "notes": "Low sleep and fatigue"
+    },
+    {
+        "date": "2026-05-04",
+        "sleep_hours": 7.5,
+        "stress_score": 4,
+        "mood_score": 7,
+        "energy_score": 7,
+        "fatigue_score": 3,
+        "cramps_score": 1,
+        "hot_flashes": 0,
+        "notes": "Better recovery day"
+    },
+    {
+        "date": "2026-05-05",
+        "sleep_hours": 4.5,
+        "stress_score": 9,
+        "mood_score": 3,
+        "energy_score": 2,
+        "fatigue_score": 9,
+        "cramps_score": 5,
+        "hot_flashes": 1,
+        "notes": "Poor sleep and severe fatigue"
+    },
+    {
+        "date": "2026-05-06",
+        "sleep_hours": 6.5,
+        "stress_score": 6,
+        "mood_score": 6,
+        "energy_score": 5,
+        "fatigue_score": 5,
+        "cramps_score": 2,
+        "hot_flashes": 1,
+        "notes": "Average wellness day"
+    },
+    {
+        "date": "2026-05-07",
+        "sleep_hours": 8.5,
+        "stress_score": 2,
+        "mood_score": 9,
+        "energy_score": 9,
+        "fatigue_score": 1,
+        "cramps_score": 0,
+        "hot_flashes": 0,
+        "notes": "Excellent recovery and mood"
+    },
+    {
+        "date": "2026-05-08",
+        "sleep_hours": 5.5,
+        "stress_score": 8,
+        "mood_score": 4,
+        "energy_score": 3,
+        "fatigue_score": 8,
+        "cramps_score": 3,
+        "hot_flashes": 2,
+        "notes": "High stress and poor sleep"
+    }
+]
