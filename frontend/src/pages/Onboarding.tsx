@@ -1,220 +1,147 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import "../App.css";
 
-function Onboarding() {
+type Props = {
+  onFinish: (mode: string) => void;
+};
+
+function Onboarding({ onFinish }: Props) {
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState("");
-  const [mode, setMode] = useState("");
+  const [trackingMode, setTrackingMode] = useState("");
 
-  const handleFinish = () => {
-    const onboardingData = { goal, mode };
-    console.log("Onboarding completed:", onboardingData);
-    alert("Onboarding completed!");
+  useEffect(() => {
+    const handleBack = () => {
+      setStep(1);
+    };
+
+    window.addEventListener("popstate", handleBack);
+
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, []);
+
+  const handleGoalSelect = (selectedGoal: string) => {
+    setGoal(selectedGoal);
+
+    let selectedMode = "General wellness tracking";
+
+    if (selectedGoal === "Cycle wellness") {
+      selectedMode = "Menstrual cycle tracking";
+    } else if (selectedGoal === "Menopause support") {
+      selectedMode = "Perimenopause / menopause tracking";
+    }
+
+    setTrackingMode(selectedMode);
+    setStep(2);
+
+    window.history.pushState({ page: "onboarding-summary" }, "");
   };
 
-  const optionStyle = (selected: boolean) => ({
-    width: "100%",
-    padding: "18px",
-    marginBottom: "16px",
-    borderRadius: "16px",
-    border: selected ? "2px solid #d63384" : "1px solid #ddd",
-    backgroundColor: selected ? "#ffe3f0" : "white",
-    cursor: "pointer",
-    fontSize: "20px",
-    fontWeight: "600",
-    color: "#222",
-    transition: "0.2s",
-  });
+  const handleFinish = () => {
+    onFinish(trackingMode);
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#fdf4f7",
-        padding: "40px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "820px",
-          margin: "0 auto",
-          backgroundColor: "white",
-          padding: "42px",
-          borderRadius: "28px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            color: "#d63384",
-            fontSize: "72px",
-            marginBottom: "20px",
-            fontWeight: "bold",
-          }}
-        >
-          Welcome to Femisync
-        </h1>
+    <div className="wellness-page">
+      <main className="wellness-container">
+        <h1 className="wellness-title">Welcome to Femisync</h1>
 
-        <p
-          style={{
-            textAlign: "center",
-            color: "#555",
-            fontSize: "24px",
-            marginBottom: "40px",
-          }}
-        >
-          Let’s personalize your wellness tracking experience.
+        <p className="tracking-mode">
+          A calm space to understand your wellness patterns ✨
         </p>
 
         {step === 1 && (
-          <div>
-            <h2
-              style={{
-                textAlign: "center",
-                color: "#222",
-                fontSize: "36px",
-                marginBottom: "30px",
-              }}
-            >
-              What would you like to focus on?
-            </h2>
+          <>
+            <div className="section-heading">
+              <span className="circle-icon">🪷</span>
+              <h2>What would you like to focus on?</h2>
+            </div>
 
-            {[
-              "Cycle wellness",
-              "Mood & stress",
-              "Sleep & energy",
-              "Menopause support",
-            ].map((item) => (
+            <div className="onboarding-grid">
               <button
-                key={item}
-                onClick={() => setGoal(item)}
-                style={optionStyle(goal === item)}
+                className="onboarding-card"
+                onClick={() => handleGoalSelect("Cycle wellness")}
               >
-                {item}
+                <span className="onboarding-icon">🌸</span>
+                <h3>Cycle Wellness</h3>
+                <p>Track cramps, symptoms, and cycle-related wellness.</p>
               </button>
-            ))}
 
-            <button
-              onClick={() => setStep(2)}
-              style={primaryButton}
-            >
-              Next
-            </button>
-          </div>
+              <button
+                className="onboarding-card"
+                onClick={() => handleGoalSelect("Mood & stress")}
+              >
+                <span className="onboarding-icon">🌿</span>
+                <h3>Mood & Stress</h3>
+                <p>Understand emotional patterns and daily stress levels.</p>
+              </button>
+
+              <button
+                className="onboarding-card"
+                onClick={() => handleGoalSelect("Sleep & energy")}
+              >
+                <span className="onboarding-icon">🌙</span>
+                <h3>Sleep & Energy</h3>
+                <p>Connect rest, fatigue, and energy changes.</p>
+              </button>
+
+              <button
+                className="onboarding-card"
+                onClick={() => handleGoalSelect("Menopause support")}
+              >
+                <span className="onboarding-icon">☀️</span>
+                <h3>Menopause Support</h3>
+                <p>Track hot flashes and menopause-related changes.</p>
+              </button>
+            </div>
+          </>
         )}
 
         {step === 2 && (
-          <div>
-            <h2
-              style={{
-                textAlign: "center",
-                color: "#222",
-                fontSize: "36px",
-                marginBottom: "30px",
+          <>
+            <div className="section-heading">
+              <span className="circle-icon">♡</span>
+              <h2>You’re all set</h2>
+            </div>
+
+            <section className="horizontal-card lavender-card">
+              <div className="card-title-block">
+                <span className="circle-icon">✨</span>
+
+                <div>
+                  <h2>{goal}</h2>
+                  <p>{trackingMode}</p>
+                </div>
+              </div>
+
+              <p className="onboarding-summary">
+                Femisync will personalize your check-in experience based on your
+                selected wellness goal.
+              </p>
+            </section>
+
+            <button className="submit-button" onClick={handleFinish}>
+              Start Tracking <span>→</span>
+            </button>
+
+            <button
+              className="back-button"
+              onClick={() => {
+                setStep(1);
+                window.history.back();
               }}
             >
-              Choose your tracking mode
-            </h2>
-
-            {[
-              "Menstrual cycle tracking",
-              "Perimenopause / menopause tracking",
-              "General wellness tracking",
-            ].map((item) => (
-              <button
-                key={item}
-                onClick={() => setMode(item)}
-                style={optionStyle(mode === item)}
-              >
-                {item}
-              </button>
-            ))}
-
-            <button
-              onClick={() => setStep(1)}
-              style={secondaryButton}
-            >
-              Back
+              ← Back
             </button>
-
-            <button
-              onClick={() => setStep(3)}
-              style={primaryButton}
-            >
-              Next
-            </button>
-          </div>
+          </>
         )}
 
-        {step === 3 && (
-          <div style={{ textAlign: "center" }}>
-            <h2
-              style={{
-                color: "#222",
-                fontSize: "40px",
-                marginBottom: "20px",
-              }}
-            >
-              You’re all set!
-            </h2>
-
-            <p
-              style={{
-                color: "#555",
-                fontSize: "22px",
-                lineHeight: "1.6",
-                marginBottom: "30px",
-              }}
-            >
-              Femisync will help you track wellness patterns,
-              visualize trends, and generate personalized
-              AI-powered insights.
-            </p>
-
-            <button
-              onClick={() => setStep(2)}
-              style={secondaryButton}
-            >
-              Back
-            </button>
-
-            <button
-              onClick={handleFinish}
-              style={primaryButton}
-            >
-              Start Tracking
-            </button>
-          </div>
-        )}
-      </div>
+        <p className="footer-message">You’re doing great! 💜</p>
+      </main>
     </div>
   );
 }
-
-const primaryButton = {
-  width: "100%",
-  padding: "18px",
-  backgroundColor: "#d63384",
-  color: "white",
-  border: "none",
-  borderRadius: "16px",
-  cursor: "pointer",
-  fontSize: "24px",
-  fontWeight: "bold",
-  marginTop: "18px",
-};
-
-const secondaryButton = {
-  width: "100%",
-  padding: "18px",
-  backgroundColor: "#f8f8f8",
-  color: "#222",
-  border: "1px solid #ddd",
-  borderRadius: "16px",
-  cursor: "pointer",
-  fontSize: "22px",
-  marginTop: "18px",
-};
 
 export default Onboarding;

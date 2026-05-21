@@ -1,397 +1,312 @@
 import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../App.css";
 
-function CheckIn() {
-  const [mood, setMood] = useState(3);
-  const [stress, setStress] = useState(3);
+type Props = {
+  trackingMode: string;
+  onBack: () => void;
+};
+
+function CheckIn({ trackingMode, onBack }: Props) {
+  const [date, setDate] = useState<Date | null>(null);
+  const [mood, setMood] = useState(5);
+  const [stress, setStress] = useState(5);
   const [sleep, setSleep] = useState("");
-  const [energy, setEnergy] = useState(3);
+  const [energy, setEnergy] = useState(5);
+  const [fatigue, setFatigue] = useState(5);
+  const [cramps, setCramps] = useState(0);
+  const [hotFlashes, setHotFlashes] = useState(0);
+  const [notes, setNotes] = useState("");
   const [symptoms, setSymptoms] = useState<string[]>([]);
-  const [menopauseMode, setMenopauseMode] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
-  const [periodStart, setPeriodStart] = useState("");
-  const [periodEnd, setPeriodEnd] = useState("");
-  const [flowIntensity, setFlowIntensity] = useState("medium");
+  const isCycleTracking = trackingMode === "Menstrual cycle tracking";
+  const isMenopauseTracking =
+    trackingMode === "Perimenopause / menopause tracking";
 
-  const [hotFlashes, setHotFlashes] = useState(1);
-  const [nightSweats, setNightSweats] = useState(1);
-  const [brainFog, setBrainFog] = useState(1);
+  const formatDate = (selectedDate: Date) =>
+    selectedDate.toISOString().split("T")[0];
 
-  const [waterIntake, setWaterIntake] = useState("");
-  const [exerciseMinutes, setExerciseMinutes] = useState("");
-  const [caffeineIntake, setCaffeineIntake] = useState("");
-
-  const symptomOptions = ["Headache", "Fatigue", "Mood Swings", "Bloating"];
-
-  const handleSymptomChange = (symptom: string) => {
-    if (symptoms.includes(symptom)) {
-      setSymptoms(symptoms.filter((item) => item !== symptom));
-    } else {
-      setSymptoms([...symptoms, symptom]);
-    }
+  const toggleSymptom = (symptom: string) => {
+    setSymptoms((prev) =>
+      prev.includes(symptom)
+        ? prev.filter((item) => item !== symptom)
+        : [...prev, symptom]
+    );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setError("");
+    setSubmitted(false);
+
+    if (!date) {
+      setError("Please select a date.");
+      return;
+    }
+
+    const sleepValue = sleep === "" ? 0 : Number(sleep);
+
+    if (sleepValue < 0 || sleepValue > 24) {
+      setError("Sleep hours must be between 0 and 24.");
+      return;
+    }
+
     const checkInData = {
-      mood,
-      stress,
-      sleep,
-      energy,
-      periodStart,
-      periodEnd,
-      flowIntensity,
-      waterIntake,
-      exerciseMinutes,
-      caffeineIntake,
-      symptoms,
-      menopauseMode,
-      hotFlashes: menopauseMode ? hotFlashes : null,
-      nightSweats: menopauseMode ? nightSweats : null,
-      brainFog: menopauseMode ? brainFog : null,
+      date: formatDate(date),
+      sleep_hours: sleepValue,
+      stress_score: stress,
+      mood_score: mood,
+      energy_score: energy,
+      fatigue_score: fatigue,
+      cramps_score: isCycleTracking ? cramps : 0,
+      hot_flashes: isMenopauseTracking ? hotFlashes : 0,
+      notes,
     };
 
     console.log("Check-in submitted:", checkInData);
-    alert("Wellness check-in submitted successfully!");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/checkin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(checkInData),
+      });
+
+      if (!response.ok) throw new Error();
+
+      setSubmitted(true);
+    } catch {
+      setError("Could not connect to backend. Please make sure FastAPI is running.");
+    }
   };
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#fdf4f7",
-        padding: "40px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "860px",
-          margin: "0 auto",
-          backgroundColor: "white",
-          padding: "36px",
-          borderRadius: "24px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            marginBottom: "10px",
-            color: "#d63384",
-            fontSize: "42px",
-          }}
-        >
-          Daily Wellness Check-In
-        </h1>
+  const SliderBlock = ({
+    icon,
+    label,
+    value,
+    setValue,
+  }: {
+    icon: string;
+    label: string;
+    value: number;
+    setValue: (v: number) => void;
+  }) => (
+    <div className="metric-block">
+      <div className="metric-label">
+        <span className="metric-icon">{icon}</span>
+        <span>{label}</span>
+      </div>
 
-        <p style={{ textAlign: "center", color: "#777", marginBottom: "35px" }}>
-          Track your mood, symptoms, sleep, cycle, and lifestyle patterns.
+      <input
+        className="soft-slider"
+        type="range"
+        min="0"
+        max="10"
+        value={value}
+        onChange={(e) => setValue(Number(e.target.value))}
+      />
+
+      <p className="score">{value}/10</p>
+    </div>
+  );
+
+  return (
+    <div className="wellness-page">
+      <main className="wellness-container">
+        <h1 className="wellness-title">Daily Wellness Check-In</h1>
+
+        <p className="tracking-mode">
+          Tracking mode: <strong>{trackingMode || "General wellness"}</strong>
         </p>
 
-        <div style={{ marginBottom: "24px" }}>
-          <label>
-            Mood: <strong>{mood}/5</strong>
-          </label>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value={mood}
-            onChange={(e) => setMood(Number(e.target.value))}
-            style={{ width: "100%", marginTop: "8px" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "24px" }}>
-          <label>
-            Stress Level: <strong>{stress}/5</strong>
-          </label>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value={stress}
-            onChange={(e) => setStress(Number(e.target.value))}
-            style={{ width: "100%", marginTop: "8px" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "24px" }}>
-          <label>Sleep Hours</label>
-          <input
-            type="number"
-            value={sleep}
-            onChange={(e) => setSleep(e.target.value)}
-            placeholder="Example: 7"
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginTop: "8px",
-              borderRadius: "10px",
-              border: "1px solid #ddd",
-              fontSize: "16px",
-            }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "24px" }}>
-          <label>
-            Energy Level: <strong>{energy}/5</strong>
-          </label>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value={energy}
-            onChange={(e) => setEnergy(Number(e.target.value))}
-            style={{ width: "100%", marginTop: "8px" }}
-          />
-        </div>
-
-        <h2 style={{ color: "#d63384", marginTop: "30px" }}>Cycle Tracking</h2>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "16px",
-            marginBottom: "24px",
-          }}
-        >
-          <div>
-            <label>Period Start Date</label>
-            <input
-              type="date"
-              value={periodStart}
-              onChange={(e) => setPeriodStart(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "10px",
-                border: "1px solid #ddd",
-              }}
-            />
+        <section className="clean-section">
+          <div className="section-heading">
+            <span className="circle-icon">♡</span>
+            <h2>Today&apos;s Wellness</h2>
           </div>
 
-          <div>
-            <label>Period End Date</label>
-            <input
-              type="date"
-              value={periodEnd}
-              onChange={(e) => setPeriodEnd(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "10px",
-                border: "1px solid #ddd",
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{ marginBottom: "24px" }}>
-          <label>Flow Intensity</label>
-          <select
-            value={flowIntensity}
-            onChange={(e) => setFlowIntensity(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginTop: "8px",
-              borderRadius: "10px",
-              border: "1px solid #ddd",
-              fontSize: "16px",
-            }}
-          >
-            <option value="light">Light</option>
-            <option value="medium">Medium</option>
-            <option value="heavy">Heavy</option>
-          </select>
-        </div>
-
-        <h2 style={{ color: "#d63384", marginTop: "30px" }}>
-          Lifestyle Tracking
-        </h2>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: "16px",
-            marginBottom: "24px",
-          }}
-        >
-          <div>
-            <label>Water Intake (L)</label>
-            <input
-              type="number"
-              value={waterIntake}
-              onChange={(e) => setWaterIntake(e.target.value)}
-              placeholder="2"
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "10px",
-                border: "1px solid #ddd",
-              }}
-            />
-          </div>
-
-          <div>
-            <label>Exercise (mins)</label>
-            <input
-              type="number"
-              value={exerciseMinutes}
-              onChange={(e) => setExerciseMinutes(e.target.value)}
-              placeholder="30"
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "10px",
-                border: "1px solid #ddd",
-              }}
-            />
-          </div>
-
-          <div>
-            <label>Caffeine Intake</label>
-            <input
-              type="number"
-              value={caffeineIntake}
-              onChange={(e) => setCaffeineIntake(e.target.value)}
-              placeholder="2 cups"
-              style={{
-                width: "100%",
-                padding: "12px",
-                marginTop: "8px",
-                borderRadius: "10px",
-                border: "1px solid #ddd",
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{ marginBottom: "24px" }}>
-          <label>Symptoms</label>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "12px",
-              marginTop: "12px",
-            }}
-          >
-            {symptomOptions.map((symptom) => (
-              <label
-                key={symptom}
-                style={{
-                  padding: "12px",
-                  border: "1px solid #eee",
-                  borderRadius: "12px",
-                  backgroundColor: symptoms.includes(symptom)
-                    ? "#ffe3f0"
-                    : "#fafafa",
-                  cursor: "pointer",
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={symptoms.includes(symptom)}
-                  onChange={() => handleSymptomChange(symptom)}
-                  style={{ marginRight: "8px" }}
-                />
-                {symptom}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div
-          style={{
-            marginBottom: "28px",
-            padding: "18px",
-            borderRadius: "14px",
-            backgroundColor: "#fff5f9",
-          }}
-        >
-          <label>
-            <input
-              type="checkbox"
-              checked={menopauseMode}
-              onChange={(e) => setMenopauseMode(e.target.checked)}
-              style={{ marginRight: "8px" }}
-            />
-            Enable Menopause / Perimenopause Mode
-          </label>
-
-          {menopauseMode && (
-            <div style={{ marginTop: "20px" }}>
-              <div style={{ marginBottom: "18px" }}>
-                <label>
-                  Hot Flashes: <strong>{hotFlashes}/5</strong>
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={hotFlashes}
-                  onChange={(e) => setHotFlashes(Number(e.target.value))}
-                  style={{ width: "100%", marginTop: "8px" }}
-                />
+          <div className="metrics-grid">
+            <div className="metric-block">
+              <div className="metric-label">
+                <span className="metric-icon">📅</span>
+                <span>Select Date</span>
               </div>
 
-              <div style={{ marginBottom: "18px" }}>
-                <label>
-                  Night Sweats: <strong>{nightSweats}/5</strong>
-                </label>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={nightSweats}
-                  onChange={(e) => setNightSweats(Number(e.target.value))}
-                  style={{ width: "100%", marginTop: "8px" }}
-                />
+              <DatePicker
+                selected={date}
+                onChange={(selectedDate) => setDate(selectedDate)}
+                placeholderText="Select Date"
+                dateFormat="MMMM d, yyyy"
+                maxDate={new Date()}
+                className="date-picker-input"
+              />
+            </div>
+
+            <SliderBlock icon="☺" label="Mood Score" value={mood} setValue={setMood} />
+
+            <SliderBlock
+              icon="☹"
+              label="Stress Score"
+              value={stress}
+              setValue={setStress}
+            />
+
+            <div className="metric-block">
+              <div className="metric-label">
+                <span className="metric-icon">☾</span>
+                <span>Sleep Hours</span>
               </div>
 
-              <div>
-                <label>
-                  Brain Fog / Focus Issues: <strong>{brainFog}/5</strong>
-                </label>
+              <div className="sleep-wrapper">
                 <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={brainFog}
-                  onChange={(e) => setBrainFog(Number(e.target.value))}
-                  style={{ width: "100%", marginTop: "8px" }}
+                  value={sleep}
+                  type="number"
+                  onChange={(e) => setSleep(e.target.value)}
+                  placeholder="e.g. 7"
+                  className="soft-input"
                 />
+                <span>hrs</span>
               </div>
             </div>
-          )}
-        </div>
 
-        <button
-          onClick={handleSubmit}
-          style={{
-            width: "100%",
-            padding: "14px",
-            backgroundColor: "#d63384",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            cursor: "pointer",
-            fontSize: "17px",
-            fontWeight: "bold",
-          }}
-        >
-          Submit Check-In
+            <SliderBlock
+              icon="⚡"
+              label="Energy Score"
+              value={energy}
+              setValue={setEnergy}
+            />
+
+            <SliderBlock
+              icon="☁"
+              label="Fatigue Score"
+              value={fatigue}
+              setValue={setFatigue}
+            />
+          </div>
+
+          <div className="notes-area">
+            <div className="metric-label">
+              <span className="metric-icon">📝</span>
+              <span>Notes</span>
+            </div>
+
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="How are you feeling today?"
+              className="soft-textarea"
+            />
+          </div>
+        </section>
+
+        {isCycleTracking && (
+          <section className="horizontal-card lavender-card">
+            <div className="card-title-block">
+              <span className="circle-icon">🌸</span>
+              <div>
+                <h2>Cycle Tracking</h2>
+                <p>Track your period symptoms</p>
+              </div>
+            </div>
+
+            <div className="wide-slider">
+              <label>Cramps Score</label>
+              <input
+                className="soft-slider"
+                type="range"
+                min="0"
+                max="10"
+                value={cramps}
+                onChange={(e) => setCramps(Number(e.target.value))}
+              />
+              <p>{cramps}/10</p>
+            </div>
+          </section>
+        )}
+
+        {isMenopauseTracking && (
+          <section className="horizontal-card lavender-card">
+            <div className="card-title-block">
+              <span className="circle-icon">☀️</span>
+              <div>
+                <h2>Menopause Tracking</h2>
+                <p>Track menopause-related symptoms</p>
+              </div>
+            </div>
+
+            <div className="wide-slider">
+              <label>Hot Flashes</label>
+              <input
+                className="soft-slider"
+                type="range"
+                min="0"
+                max="10"
+                value={hotFlashes}
+                onChange={(e) => setHotFlashes(Number(e.target.value))}
+              />
+              <p>{hotFlashes}/10</p>
+            </div>
+          </section>
+        )}
+
+        <section className="horizontal-card sage-card">
+          <div className="card-title-block">
+            <span className="circle-icon sage">♡</span>
+            <div>
+              <h2>Symptoms</h2>
+              <p>Select any symptoms you&apos;re experiencing</p>
+            </div>
+          </div>
+
+          <div className="symptom-row">
+            {["Headache", "Fatigue", "Mood Swings", "Bloating"].map((symptom) => (
+              <button
+                type="button"
+                key={symptom}
+                onClick={() => toggleSymptom(symptom)}
+                className={
+                  symptoms.includes(symptom)
+                    ? "symptom-pill active"
+                    : "symptom-pill"
+                }
+              >
+                <span>
+                  {symptom === "Headache"
+                    ? "🧠"
+                    : symptom === "Fatigue"
+                    ? "🔋"
+                    : symptom === "Mood Swings"
+                    ? "🎭"
+                    : "🌙"}
+                </span>
+                {symptom}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {error && <div className="error-box">{error}</div>}
+
+        {submitted && (
+          <div className="success-box">
+            Wellness check-in submitted successfully ✓
+          </div>
+        )}
+
+        <button onClick={handleSubmit} className="submit-button">
+          Submit Check-In <span>→</span>
         </button>
-      </div>
+
+        <button className="bottom-back-button" onClick={onBack}>
+          ← Back to Onboarding
+        </button>
+
+        <p className="footer-message">You&apos;re doing great! 💜</p>
+      </main>
     </div>
   );
 }
