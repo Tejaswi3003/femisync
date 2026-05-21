@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from backend.services.insight_service import generate_insights
 
-router = APIRouter()
+router = APIRouter(tags=["Insights"])
 
 @router.get("/insights")
 def get_insights():

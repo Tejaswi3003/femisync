@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from backend.models.wellness import WellnessCheckIn
 from backend.services.checkin_service import save_checkin, get_all_checkins
 
-router = APIRouter()
+router = APIRouter(tags=["Check-ins"])
 wellness_logs = []
 
 @router.post("/checkin")

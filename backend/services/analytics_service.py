@@ -1,28 +1,36 @@
+import pandas as pd
+
 from backend.services.checkin_service import get_raw_checkins
 
-def calculate_correlation(x_values, y_values):
-    n = len(x_values)
 
-    if n < 2:
+def calculate_correlation(df, x_column, y_column):
+    if len(df) < 2:
         return None
 
-    x_mean = sum(x_values) / n
-    y_mean = sum(y_values) / n
-
-    numerator = sum(
-        (x_values[i] - x_mean) * (y_values[i] - y_mean)
-        for i in range(n)
-    )
-
-    x_denominator = sum((x - x_mean) ** 2 for x in x_values)
-    y_denominator = sum((y - y_mean) ** 2 for y in y_values)
-
-    if x_denominator == 0 or y_denominator == 0:
+    if df[x_column].nunique() <= 1 or df[y_column].nunique() <= 1:
         return None
 
-    correlation = numerator / ((x_denominator * y_denominator) ** 0.5)
-
+    correlation = df[x_column].corr(df[y_column])
     return round(correlation, 2)
+
+def calculate_trend(df, column_name):
+    if len(df)<4:
+        return "not enough data"
+    midpoint = len(df) // 2
+
+    first_half_avg = df[column_name][:midpoint].mean()
+    second_half_avg = df[column_name][midpoint:].mean()
+
+    difference = second_half_avg - first_half_avg
+
+    if difference > 0.5:
+        return "increasing"
+    
+    elif difference < -0.5:
+        return "decreasing"
+    
+    else:
+        return "stable"
 
 def calculate_basic_analytics():
     logs = get_raw_checkins()
@@ -32,56 +40,36 @@ def calculate_basic_analytics():
             "message": "No check-ins available yet",
             "total_entries": 0
         }
-    total_entries = len(logs)
 
-    average_sleep = sum(log["sleep_hours"] for log in logs) / total_entries
-    average_stress = sum(log["stress_score"] for log in logs) / total_entries
-    average_mood = sum(log["mood_score"] for log in logs) / total_entries
-    average_energy = sum(log["energy_score"] for log in logs) / total_entries
-    average_fatigue = sum(log["fatigue_score"] for log in logs) / total_entries
+    df = pd.DataFrame(logs)
 
-    high_stress_days = sum(
-        1 for log in logs if log["stress_score"] >=7
-    )
-
-    low_sleep_days = sum(
-        1 for log in logs if log["sleep_hours"] < 6
-    )
-
-    high_fatigue_days = sum(
-        1 for log in logs if log["fatigue_score"] >= 7
-    )
-
-    cramps_days = sum(
-        1 for log in logs if log["cramps_score"] > 0
-    )
-
-    sleep_values = [log["sleep_hours"] for log in logs]
-    stress_values = [log["stress_score"] for log in logs]
-    mood_values = [log["mood_score"] for log in logs]
-    fatigue_values = [log["fatigue_score"] for log in logs]
-    energy_values = [log["energy_score"] for log in logs]
-
-    sleep_fatigue_correlation = calculate_correlation(sleep_values, fatigue_values)
-    stress_mood_correlation = calculate_correlation(stress_values, mood_values)
-    stress_fatigue_correlation = calculate_correlation(stress_values, fatigue_values)
-    sleep_energy_correlation = calculate_correlation(sleep_values, energy_values)
+    total_entries = len(df)
 
     return {
         "total_entries": total_entries,
-        "average_sleep": round(average_sleep, 2),
-        "average_stress": round(average_stress, 2),
-        "average_mood": round(average_mood, 2),
-        "average_energy": round(average_energy, 2),
-        "average_fatigue": round(average_fatigue, 2),
-        "high_stress_days": high_stress_days,
-        "low_sleep_days": low_sleep_days,
-        "high_fatigue_days": high_fatigue_days,
-        "cramps_days": cramps_days,
+
+        "average_sleep": round(df["sleep_hours"].mean(), 2),
+        "average_stress": round(df["stress_score"].mean(), 2),
+        "average_mood": round(df["mood_score"].mean(), 2),
+        "average_energy": round(df["energy_score"].mean(), 2),
+        "average_fatigue": round(df["fatigue_score"].mean(), 2),
+
+        "high_stress_days": int((df["stress_score"] >= 7).sum()),
+        "low_sleep_days": int((df["sleep_hours"] < 6).sum()),
+        "high_fatigue_days": int((df["fatigue_score"] >= 7).sum()),
+        "cramps_days": int((df["cramps_score"] > 0).sum()),
+
         "correlations": {
-            "sleep_fatigue": sleep_fatigue_correlation,
-            "stress_mood": stress_mood_correlation,
-            "stress_fatigue": stress_fatigue_correlation,
-            "sleep_energy": sleep_energy_correlation
+            "sleep_fatigue": calculate_correlation(df, "sleep_hours", "fatigue_score"),
+            "stress_mood": calculate_correlation(df, "stress_score", "mood_score"),
+            "stress_fatigue": calculate_correlation(df, "stress_score", "fatigue_score"),
+            "sleep_energy": calculate_correlation(df, "sleep_hours", "energy_score")
+        },
+
+        "trends": {
+            "sleep_trend": calculate_trend(df, "sleep_hours"),
+            "stress_trend": calculate_trend(df, "stress_score"),
+            "fatigue_trend": calculate_trend(df, "fatigue_score"),
+            "energy_trend": calculate_trend(df, "energy_score")
         }
     }
