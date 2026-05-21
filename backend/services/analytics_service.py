@@ -1,5 +1,29 @@
 from backend.services.checkin_service import get_raw_checkins
 
+def calculate_correlation(x_values, y_values):
+    n = len(x_values)
+
+    if n < 2:
+        return None
+
+    x_mean = sum(x_values) / n
+    y_mean = sum(y_values) / n
+
+    numerator = sum(
+        (x_values[i] - x_mean) * (y_values[i] - y_mean)
+        for i in range(n)
+    )
+
+    x_denominator = sum((x - x_mean) ** 2 for x in x_values)
+    y_denominator = sum((y - y_mean) ** 2 for y in y_values)
+
+    if x_denominator == 0 or y_denominator == 0:
+        return None
+
+    correlation = numerator / ((x_denominator * y_denominator) ** 0.5)
+
+    return round(correlation, 2)
+
 def calculate_basic_analytics():
     logs = get_raw_checkins()
 
@@ -32,6 +56,17 @@ def calculate_basic_analytics():
         1 for log in logs if log["cramps_score"] > 0
     )
 
+    sleep_values = [log["sleep_hours"] for log in logs]
+    stress_values = [log["stress_score"] for log in logs]
+    mood_values = [log["mood_score"] for log in logs]
+    fatigue_values = [log["fatigue_score"] for log in logs]
+    energy_values = [log["energy_score"] for log in logs]
+
+    sleep_fatigue_correlation = calculate_correlation(sleep_values, fatigue_values)
+    stress_mood_correlation = calculate_correlation(stress_values, mood_values)
+    stress_fatigue_correlation = calculate_correlation(stress_values, fatigue_values)
+    sleep_energy_correlation = calculate_correlation(sleep_values, energy_values)
+
     return {
         "total_entries": total_entries,
         "average_sleep": round(average_sleep, 2),
@@ -42,5 +77,11 @@ def calculate_basic_analytics():
         "high_stress_days": high_stress_days,
         "low_sleep_days": low_sleep_days,
         "high_fatigue_days": high_fatigue_days,
-        "cramps_days": cramps_days
+        "cramps_days": cramps_days,
+        "correlations": {
+            "sleep_fatigue": sleep_fatigue_correlation,
+            "stress_mood": stress_mood_correlation,
+            "stress_fatigue": stress_fatigue_correlation,
+            "sleep_energy": sleep_energy_correlation
+        }
     }
