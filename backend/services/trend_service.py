@@ -43,6 +43,34 @@ def generate_trend_data(window="all"):
         .round(2)
     )
 
+    df["cramps_rolling_avg"] = (
+    df["cramps_score"]
+    .rolling(window=3, min_periods=1)
+    .mean()
+    .round(2)
+    )
+
+    df["flow_rolling_avg"] = (
+        df["flow_intensity"]
+        .rolling(window=3, min_periods=1)
+        .mean()
+        .round(2)
+    )
+
+    df["hot_flashes_rolling_avg"] = (
+        df["hot_flashes"]
+        .rolling(window=3, min_periods=1)
+        .mean()
+        .round(2)
+    )
+
+    df["sleep_disruption_rolling_avg"] = (
+        df["sleep_disruption"]
+        .rolling(window=3, min_periods=1)
+        .mean()
+        .round(2)
+    )
+
     return {
         "sleep_trend": [
             {
@@ -66,5 +94,37 @@ def generate_trend_data(window="all"):
                 "value": row["fatigue_rolling_avg"]
             }
             for _, row in df.iterrows()
-        ]
+        ],
+
+        "cramps_trend": [
+    {
+        "date": row["date"].strftime("%Y-%m-%d"),
+        "value": row["cramps_rolling_avg"]
+    }
+    for _, row in df.iterrows()
+    ],
+
+    "flow_trend": [
+        {
+            "date": row["date"].strftime("%Y-%m-%d"),
+            "value": row["flow_rolling_avg"]
+        }
+        for _, row in df.iterrows()
+    ],
+
+    "hot_flashes_trend": [
+        {
+            "date": row["date"].strftime("%Y-%m-%d"),
+            "value": row["hot_flashes_rolling_avg"]
+        }
+        for _, row in df.iterrows()
+    ],
+
+    "sleep_disruption_trend": [
+        {
+            "date": row["date"].strftime("%Y-%m-%d"),
+            "value": row["sleep_disruption_rolling_avg"]
+        }
+        for _, row in df.iterrows()
+    ]
     }

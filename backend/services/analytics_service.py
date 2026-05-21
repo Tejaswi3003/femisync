@@ -84,6 +84,10 @@ def calculate_basic_analytics(window="all"):
         "night_sweat_days": int((df["night_sweats"] > 0).sum()),
         "sleep_disruption_days": int((df["sleep_disruption"] > 0).sum()),
 
+        "average_sleep_disruption": round(df["sleep_disruption"].mean(), 2),
+        "average_hot_flashes": round(df["hot_flashes"].mean(), 2),
+        "average_night_sweats": round(df["night_sweats"].mean(), 2),
+
         "average_brain_fog": round(df["brain_fog"].mean(), 2),
         "average_mood_swings": round(df["mood_swings"].mean(), 2),
 
