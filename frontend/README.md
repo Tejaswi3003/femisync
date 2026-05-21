@@ -15,7 +15,6 @@ The goal is not to diagnose medical conditions, but to help users understand wel
 - Calendar date picker
 - Symptom selection
 - Notes input
-- Responsive pastel UI design
 - Frontend payload aligned with backend API contract
 
 ## Tech Stack
