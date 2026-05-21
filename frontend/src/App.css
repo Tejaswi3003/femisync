@@ -898,3 +898,206 @@ body {
 .back-button:active {
   transform: scale(0.99);
 }
+.period-toggle {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 22px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #faf5ff,
+      #f7fbf8
+    );
+
+  border:
+    1px solid
+    #e7d8ff;
+
+  cursor: pointer;
+
+  transition: 0.25s;
+
+  margin-bottom: 28px;
+}
+
+.period-toggle:hover {
+  transform:
+    translateY(
+      -2px
+    );
+
+  box-shadow:
+    0 16px 30px
+    rgba(
+      139,
+      99,
+      215,
+      0.08
+    );
+}
+
+.period-toggle.active {
+  border:
+    2px solid
+    #8b63d7;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f2e8ff,
+      #e8f5ec
+    );
+}
+
+.period-icon {
+  width: 64px;
+
+  height: 64px;
+
+  border-radius: 50%;
+
+  background:
+    #efe3ff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 28px;
+}
+
+.period-title {
+  font-size: 1.3rem;
+
+  font-weight: 700;
+
+  color:
+    #203354;
+}
+
+.period-subtitle {
+  color:
+    #64748b;
+
+  margin-top: 4px;
+}
+
+.toggle-circle {
+  width: 40px;
+
+  height: 40px;
+
+  border-radius: 50%;
+
+  background:
+    white;
+
+  border:
+    2px solid
+    #d9cdf6;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color:
+    #8b63d7;
+
+  font-weight: 800;
+}
+
+.period-toggle.active .toggle-circle {
+  background:
+    #8b63d7;
+
+  color:
+    white;
+}
+.auth-container {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(18px);
+  border-radius: 36px;
+  padding: 48px 60px;
+  box-shadow: 0 20px 50px rgba(94, 86, 135, 0.08);
+}
+
+.auth-card {
+  margin-top: 36px;
+  padding: 34px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid #ddd7e8;
+  box-shadow: 0 14px 34px rgba(30, 42, 68, 0.06);
+}
+
+.auth-input {
+  width: 100%;
+  height: 58px;
+  margin-bottom: 18px;
+  padding: 0 20px;
+  border-radius: 16px;
+  border: 1px solid #ddd6fe;
+  background: white;
+  color: #334155;
+  font-size: 1rem;
+  outline: none;
+}
+
+.auth-input:focus {
+  border-color: #8b63d7;
+  box-shadow: 0 0 0 4px rgba(139, 99, 215, 0.1);
+}
+
+.demo-button {
+  width: min(520px, 100%);
+  height: 58px;
+  margin: 10px auto 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ddd7e8;
+  border-radius: 18px;
+  background: white;
+  color: #8b63d7;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.demo-button:hover {
+  background: #f6f1ff;
+}
+
+.auth-switch {
+  text-align: center;
+  color: #64748b;
+}
+
+.auth-switch button {
+  border: none;
+  background: transparent;
+  color: #8b63d7;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 32px 22px;
+  }
+}

@@ -73,7 +73,7 @@ function Onboarding({ onFinish }: Props) {
                 className="onboarding-card"
                 onClick={() => handleGoalSelect("Mood & stress")}
               >
-                <span className="onboarding-icon">🌿</span>
+                <span className="onboarding-icon">🙂</span>
                 <h3>Mood & Stress</h3>
                 <p>Understand emotional patterns and daily stress levels.</p>
               </button>
@@ -91,7 +91,7 @@ function Onboarding({ onFinish }: Props) {
                 className="onboarding-card"
                 onClick={() => handleGoalSelect("Menopause support")}
               >
-                <span className="onboarding-icon">☀️</span>
+                <span className="onboarding-icon">🍃</span>
                 <h3>Menopause Support</h3>
                 <p>Track hot flashes and menopause-related changes.</p>
               </button>

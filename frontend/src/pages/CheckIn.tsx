@@ -10,13 +10,24 @@ type Props = {
 
 function CheckIn({ trackingMode, onBack }: Props) {
   const [date, setDate] = useState<Date | null>(null);
+  const [sleep, setSleep] = useState("");
+
   const [mood, setMood] = useState(5);
   const [stress, setStress] = useState(5);
-  const [sleep, setSleep] = useState("");
   const [energy, setEnergy] = useState(5);
   const [fatigue, setFatigue] = useState(5);
+
+  const [periodStatus, setPeriodStatus] = useState(false);
+  const [flowIntensity, setFlowIntensity] = useState(0);
+  const [cycleDay, setCycleDay] = useState("");
   const [cramps, setCramps] = useState(0);
+
   const [hotFlashes, setHotFlashes] = useState(0);
+  const [nightSweats, setNightSweats] = useState(0);
+  const [sleepDisruption, setSleepDisruption] = useState(0);
+  const [brainFog, setBrainFog] = useState(0);
+  const [moodSwings, setMoodSwings] = useState(0);
+
   const [notes, setNotes] = useState("");
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
@@ -47,6 +58,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
     }
 
     const sleepValue = sleep === "" ? 0 : Number(sleep);
+    const cycleDayValue = cycleDay === "" ? 0 : Number(cycleDay);
 
     if (sleepValue < 0 || sleepValue > 24) {
       setError("Sleep hours must be between 0 and 24.");
@@ -60,8 +72,19 @@ function CheckIn({ trackingMode, onBack }: Props) {
       mood_score: mood,
       energy_score: energy,
       fatigue_score: fatigue,
+
+      period_status: isCycleTracking ? periodStatus : false,
+      flow_intensity: isCycleTracking ? flowIntensity : 0,
+      cycle_day: isCycleTracking ? cycleDayValue : 0,
       cramps_score: isCycleTracking ? cramps : 0,
+
       hot_flashes: isMenopauseTracking ? hotFlashes : 0,
+      night_sweats: isMenopauseTracking ? nightSweats : 0,
+
+      sleep_disruption: sleepDisruption,
+      brain_fog: brainFog,
+      mood_swings: moodSwings,
+
       notes,
     };
 
@@ -89,11 +112,13 @@ function CheckIn({ trackingMode, onBack }: Props) {
     label,
     value,
     setValue,
+    max = 10,
   }: {
     icon: string;
     label: string;
     value: number;
     setValue: (v: number) => void;
+    max?: number;
   }) => (
     <div className="metric-block">
       <div className="metric-label">
@@ -105,12 +130,14 @@ function CheckIn({ trackingMode, onBack }: Props) {
         className="soft-slider"
         type="range"
         min="0"
-        max="10"
+        max={max}
         value={value}
         onChange={(e) => setValue(Number(e.target.value))}
       />
 
-      <p className="score">{value}/10</p>
+      <p className="score">
+        {value}/{max}
+      </p>
     </div>
   );
 
@@ -147,13 +174,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
             </div>
 
             <SliderBlock icon="☺" label="Mood Score" value={mood} setValue={setMood} />
-
-            <SliderBlock
-              icon="☹"
-              label="Stress Score"
-              value={stress}
-              setValue={setStress}
-            />
+            <SliderBlock icon="☹" label="Stress Score" value={stress} setValue={setStress} />
 
             <div className="metric-block">
               <div className="metric-label">
@@ -173,19 +194,8 @@ function CheckIn({ trackingMode, onBack }: Props) {
               </div>
             </div>
 
-            <SliderBlock
-              icon="⚡"
-              label="Energy Score"
-              value={energy}
-              setValue={setEnergy}
-            />
-
-            <SliderBlock
-              icon="☁"
-              label="Fatigue Score"
-              value={fatigue}
-              setValue={setFatigue}
-            />
+            <SliderBlock icon="⚡" label="Energy Score" value={energy} setValue={setEnergy} />
+            <SliderBlock icon="☁" label="Fatigue Score" value={fatigue} setValue={setFatigue} />
           </div>
 
           <div className="notes-area">
@@ -209,12 +219,75 @@ function CheckIn({ trackingMode, onBack }: Props) {
               <span className="circle-icon">🌸</span>
               <div>
                 <h2>Cycle Tracking</h2>
-                <p>Track your period symptoms</p>
+                <p>Track period status, flow, cycle day, and cramps</p>
               </div>
             </div>
 
             <div className="wide-slider">
-              <label>Cramps Score</label>
+              <div
+  className={`period-toggle ${
+    periodStatus ? "active" : ""
+  }`}
+  onClick={() =>
+    setPeriodStatus(
+      !periodStatus
+    )
+  }
+>
+  <div className="period-icon">
+  {periodStatus ? "🩸" : "🌿"}
+</div>
+
+  <div>
+    <div className="period-title">
+      Period Today
+    </div>
+
+    <div className="period-subtitle">
+      {
+        periodStatus
+          ? "Tracking enabled"
+          : "Tap to enable"
+      }
+    </div>
+  </div>
+
+  <div className="toggle-circle">
+    {periodStatus
+      ? "✓"
+      : ""}
+  </div>
+</div>
+
+              <br />
+              <br />
+
+              <label>Cycle Day</label>
+              <input
+                value={cycleDay}
+                type="number"
+                onChange={(e) => setCycleDay(e.target.value)}
+                placeholder="e.g. 2"
+                className="soft-input"
+              />
+
+              <br />
+              <br />
+
+              <label>Flow Intensity: {flowIntensity}/5</label>
+              <input
+                className="soft-slider"
+                type="range"
+                min="0"
+                max="5"
+                value={flowIntensity}
+                onChange={(e) => setFlowIntensity(Number(e.target.value))}
+              />
+
+              <br />
+              <br />
+
+              <label>Cramps Score: {cramps}/10</label>
               <input
                 className="soft-slider"
                 type="range"
@@ -223,7 +296,6 @@ function CheckIn({ trackingMode, onBack }: Props) {
                 value={cramps}
                 onChange={(e) => setCramps(Number(e.target.value))}
               />
-              <p>{cramps}/10</p>
             </div>
           </section>
         )}
@@ -239,7 +311,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
             </div>
 
             <div className="wide-slider">
-              <label>Hot Flashes</label>
+              <label>Hot Flashes: {hotFlashes}/10</label>
               <input
                 className="soft-slider"
                 type="range"
@@ -248,10 +320,70 @@ function CheckIn({ trackingMode, onBack }: Props) {
                 value={hotFlashes}
                 onChange={(e) => setHotFlashes(Number(e.target.value))}
               />
-              <p>{hotFlashes}/10</p>
+
+              <br />
+              <br />
+
+              <label>Night Sweats: {nightSweats}/10</label>
+              <input
+                className="soft-slider"
+                type="range"
+                min="0"
+                max="10"
+                value={nightSweats}
+                onChange={(e) => setNightSweats(Number(e.target.value))}
+              />
             </div>
           </section>
         )}
+
+        <section className="horizontal-card lavender-card">
+          <div className="card-title-block">
+            <span className="circle-icon">🌙</span>
+            <div>
+              <h2>Additional Wellness Details</h2>
+              <p>Optional symptoms used for analytics and AI summaries</p>
+            </div>
+          </div>
+
+          <div className="wide-slider">
+            <label>Sleep Disruption: {sleepDisruption}/10</label>
+            <input
+              className="soft-slider"
+              type="range"
+              min="0"
+              max="10"
+              value={sleepDisruption}
+              onChange={(e) => setSleepDisruption(Number(e.target.value))}
+            />
+
+            <br />
+            <br />
+
+            <label>Brain Fog: {brainFog}/10</label>
+            <input
+              className="soft-slider"
+              type="range"
+              min="0"
+              max="10"
+              value={brainFog}
+              onChange={(e) => setBrainFog(Number(e.target.value))}
+            />
+
+            <br />
+            <br />
+
+            <label>Mood Swings: {moodSwings}/10</label>
+            <input
+              className="soft-slider"
+              type="range"
+              min="0"
+              max="10"
+              value={moodSwings}
+              onChange={(e) => setMoodSwings(Number(e.target.value))}
+            />
+          </div>
+        </section>
 
         <section className="horizontal-card sage-card">
           <div className="card-title-block">
@@ -268,11 +400,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
                 type="button"
                 key={symptom}
                 onClick={() => toggleSymptom(symptom)}
-                className={
-                  symptoms.includes(symptom)
-                    ? "symptom-pill active"
-                    : "symptom-pill"
-                }
+                className={symptoms.includes(symptom) ? "symptom-pill active" : "symptom-pill"}
               >
                 <span>
                   {symptom === "Headache"
@@ -281,7 +409,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
                     ? "🔋"
                     : symptom === "Mood Swings"
                     ? "🎭"
-                    : "🌙"}
+                    : "😮‍💨"}
                 </span>
                 {symptom}
               </button>
@@ -301,7 +429,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
           Submit Check-In <span>→</span>
         </button>
 
-        <button className="bottom-back-button" onClick={onBack}>
+        <button className="back-button" onClick={onBack}>
           ← Back to Onboarding
         </button>
 
