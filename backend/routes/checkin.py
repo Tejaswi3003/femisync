@@ -1,22 +1,14 @@
 from fastapi import APIRouter
 from backend.models.wellness import WellnessCheckIn
+from backend.services.checkin_service import save_checkin, get_all_checkins
 
 router = APIRouter()
 wellness_logs = []
 
 @router.post("/checkin")
 def create_checkin(checkin: WellnessCheckIn):
-    wellness_logs.append(checkin)
-
-    return {
-        "message": "Check-in saved successfully",
-        "total_logs": len(wellness_logs),
-        "data": checkin
-    }
+    return save_checkin(checkin)
 
 @router.get("/checkins")
 def get_checkins():
-    return {
-        "total_logs": len(wellness_logs),
-        "data": wellness_logs
-    }
+    return get_all_checkins()
