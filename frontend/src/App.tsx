@@ -1,94 +1,160 @@
 import { useEffect, useState } from "react";
 import Auth from "./pages/Auth";
-import Onboarding from "./pages/Onboarding";
 import CheckIn from "./pages/CheckIn";
+import Dashboard from "./pages/Dashboard";
+import Analytics from "./pages/Analytics";
 import "./App.css";
 
-type Page = "auth" | "onboarding" | "checkin";
+type Page = "auth" | "dashboard" | "checkin" | "analytics";
+type AuthMode = "signin" | "signup";
 
 function App() {
   const [page, setPage] = useState<Page>("auth");
-  const [trackingMode, setTrackingMode] = useState("");
+  const [authMode, setAuthMode] = useState<AuthMode>("signin");
+  const [trackingMode, setTrackingMode] = useState("General wellness tracking");
+
+  const navigateTo = (nextPage: Page, nextAuthMode?: AuthMode) => {
+    setPage(nextPage);
+
+    if (nextPage === "auth") {
+      const mode = nextAuthMode || authMode;
+      setAuthMode(mode);
+      window.history.pushState({ page: "auth", authMode: mode }, "", `/${mode}`);
+      return;
+    }
+
+    if (nextPage === "dashboard") {
+      window.history.pushState({ page: "dashboard" }, "", "/dashboard");
+      return;
+    }
+
+    if (nextPage === "checkin") {
+      window.history.pushState({ page: "checkin" }, "", "/checkin");
+      return;
+    }
+
+    if (nextPage === "analytics") {
+      window.history.pushState({ page: "analytics" }, "", "/analytics");
+    }
+  };
 
   useEffect(() => {
     const demoUser = localStorage.getItem("femisync_demo_user");
+    const path = window.location.pathname;
 
     if (demoUser === "true") {
-      setPage("onboarding");
-      window.history.replaceState({ page: "onboarding" }, "");
+      if (path === "/analytics") {
+        setPage("analytics");
+        window.history.replaceState({ page: "analytics" }, "", "/analytics");
+      } else if (path === "/checkin") {
+        setPage("checkin");
+        window.history.replaceState({ page: "checkin" }, "", "/checkin");
+      } else {
+        setPage("dashboard");
+        window.history.replaceState({ page: "dashboard" }, "", "/dashboard");
+      }
+
+      return;
+    }
+
+    if (path === "/signup") {
+      setAuthMode("signup");
+      setPage("auth");
+      window.history.replaceState(
+        { page: "auth", authMode: "signup" },
+        "",
+        "/signup"
+      );
     } else {
-      window.history.replaceState({ page: "auth" }, "");
+      setAuthMode("signin");
+      setPage("auth");
+      window.history.replaceState(
+        { page: "auth", authMode: "signin" },
+        "",
+        "/signin"
+      );
     }
   }, []);
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       const historyPage = event.state?.page;
+      const historyAuthMode = event.state?.authMode;
 
       if (historyPage === "auth") {
         setPage("auth");
-      } else if (historyPage === "onboarding") {
-        setPage("onboarding");
-      } else if (historyPage === "checkin") {
-        setPage("checkin");
+        setAuthMode(historyAuthMode === "signup" ? "signup" : "signin");
       }
+
+      if (historyPage === "dashboard") setPage("dashboard");
+      if (historyPage === "checkin") setPage("checkin");
+      if (historyPage === "analytics") setPage("analytics");
     };
 
     window.addEventListener("popstate", handlePopState);
 
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
+
+  const handleAuthModeChange = (mode: AuthMode) => {
+    navigateTo("auth", mode);
+  };
 
   const handleDemoLogin = () => {
     localStorage.setItem("femisync_demo_user", "true");
-    setPage("onboarding");
-    window.history.pushState({ page: "onboarding" }, "");
+    navigateTo("dashboard");
   };
 
-  const goToCheckIn = (mode: string) => {
-    setTrackingMode(mode);
-    setPage("checkin");
-    window.history.pushState({ page: "checkin" }, "");
+  const goToCheckIn = () => {
+    setTrackingMode("General wellness tracking");
+    navigateTo("checkin");
   };
 
-  const goBack = () => {
-    window.history.back();
+  const goToDashboard = () => {
+    navigateTo("dashboard");
+  };
+
+  const goToAnalytics = () => {
+    navigateTo("analytics");
   };
 
   const logout = () => {
     localStorage.removeItem("femisync_demo_user");
-    setPage("auth");
     setTrackingMode("");
-    window.history.pushState({ page: "auth" }, "");
+    sessionStorage.clear();
+    navigateTo("auth", "signin");
   };
 
   if (page === "auth") {
-    return <Auth onDemoLogin={handleDemoLogin} />;
+    return (
+      <Auth
+        initialMode={authMode}
+        onModeChange={handleAuthModeChange}
+        onDemoLogin={handleDemoLogin}
+      />
+    );
+  }
+
+  if (page === "checkin") {
+    return <CheckIn trackingMode={trackingMode} onBack={goToDashboard} />;
+  }
+
+  if (page === "analytics") {
+    return (
+      <Analytics
+        onDashboard={goToDashboard}
+        onCheckIn={goToCheckIn}
+        onLogout={logout}
+      />
+    );
   }
 
   return (
-    <>
-      <div
-        style={{
-          position: "fixed",
-          right: "24px",
-          top: "24px",
-          zIndex: 1000,
-        }}
-      >
-        <button className="demo-button" onClick={logout}>
-          Logout
-        </button>
-      </div>
-
-      {page === "checkin" ? (
-        <CheckIn trackingMode={trackingMode} onBack={goBack} />
-      ) : (
-        <Onboarding onFinish={goToCheckIn} />
-      )}
-    </>
+    <Dashboard
+      onCheckIn={goToCheckIn}
+      onAnalytics={goToAnalytics}
+      onLogout={logout}
+    />
   );
 }
 
