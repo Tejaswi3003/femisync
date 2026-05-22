@@ -56,12 +56,22 @@ The platform transforms this data into analytics dashboards, trend visualization
 ## Project Structure
 
 ```text
-Femisync/
+femisync/
 │
 ├── backend/
+│   ├── main.py
+│   ├── routes/
+│   ├── services/
+│   ├── models/
+│   └── requirements.txt
+│
 ├── frontend/
-├── .env.example
-└── README.md
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── README.md
+└── .gitignore
 ```
 
 ---
@@ -71,39 +81,31 @@ Femisync/
 ### Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/femisync.git
+git clone https://github.com/Tejaswi3003/femisync.git
 cd femisync
-```
-
----
-
-## Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend runs on:
-```text
-http://localhost:5173
 ```
 
 ---
 
 ## Backend Setup
 
+Run these commands from the root project folder.
+
 ### Create Virtual Environment
 
 ```bash
-cd backend
 python -m venv venv
 ```
 
 ### Activate Environment
 
-#### Windows
+#### Windows Git Bash
+
+```bash
+source venv/Scripts/activate
+```
+
+#### Windows Command Prompt
 
 ```bash
 venv\Scripts\activate
@@ -118,25 +120,50 @@ source venv/bin/activate
 ### Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ### Run Backend
 
 ```bash
-uvicorn main:app --reload
+uvicorn backend.main:app --reload
 ```
 
 Backend runs on:
+
 ```text
-http://localhost:8000
+http://127.0.0.1:8000
+```
+
+Swagger API docs:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## Frontend Setup
+
+Open a new terminal from the root project folder.
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs on:
+
+```text
+http://localhost:5173
 ```
 
 ---
 
 ## Environment Variables
 
-Create a `.env` file using `.env.example`
+Create a `.env` file in the backend folder using `.env.example`.
 
 Example:
 
@@ -170,7 +197,7 @@ class WellnessCheckIn(BaseModel):
     mood_swings: Optional[int] = 0
 
     notes: Optional[str] = ""
-```
+```s
 
 ---
 
