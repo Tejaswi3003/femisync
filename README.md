@@ -1,29 +1,24 @@
-# Femisync
+# Femisync 🌸
 
-Femisync is an AI-powered women’s wellness intelligence platform that helps users track and understand patterns related to menstrual cycles, menopause/perimenopause symptoms, mood, sleep, stress, energy, and lifestyle habits.
+AI-powered women’s wellness platform for cycle, symptom, and menopause insights.
 
-Instead of focusing only on period prediction, Femisync provides wellness analytics, personalized trend insights, and AI-powered summaries to help users better understand their overall wellness patterns.
+## Overview
 
----
+Femisync is a full-stack HealthTech platform that helps users track wellness patterns through daily check-ins and AI-powered insights.
 
-## Problem
+Users can log:
+- Sleep
+- Mood
+- Stress
+- Energy
+- Fatigue
+- Period tracking
+- Flow intensity
+- Cramps
+- Menopause/perimenopause symptoms
+- Personal wellness notes
 
-Many women track symptoms manually but may not easily recognize relationships between cycle changes, stress, sleep, mood, and lifestyle habits.
-
-Existing platforms often focus mainly on reminders and cycle prediction rather than helping users understand deeper wellness trends.
-
----
-
-## Solution
-
-Femisync transforms daily wellness check-ins into meaningful visual analytics and AI-generated insights.
-
-Users can:
-- Track cycles and symptoms
-- Monitor menopause/perimenopause wellness
-- Analyze stress, sleep, mood, and energy patterns
-- View wellness trends through dashboards
-- Receive AI-powered wellness summaries
+The platform transforms this data into analytics dashboards, trend visualizations, cycle insights, symptom tracking, and AI-generated wellness summaries.
 
 ---
 
@@ -31,14 +26,12 @@ Users can:
 
 - Daily wellness check-ins
 - Cycle tracking
-- Symptom severity tracking
-- Menopause/perimenopause support
-- Mood, stress, sleep, and energy tracking
+- Menopause/perimenopause symptom tracking
+- AI-generated wellness summaries
 - Analytics dashboard
 - Trend visualization
-- AI-generated wellness insights
-- Correlation and pattern analysis
-- Responsive modern UI
+- Symptom frequency charts
+- Responsive wellness-focused UI
 
 ---
 
@@ -48,36 +41,43 @@ Users can:
 - React
 - TypeScript
 - Vite
-- Tailwind CSS
+- CSS
+- Recharts
 
 ### Backend
 - FastAPI
 - Python
-- pandas
-- scikit-learn
 
-### Tools & APIs
-- GitHub
-- REST APIs
-- OpenAI/Gemini API (planned)
+### AI
+- Gemini API
 
 ---
 
 ## Project Structure
 
 ```text
-femisync/
-├── frontend/      # React frontend
-├── backend/       # FastAPI backend
-├── docs/          # Documentation and demo assets
-├── venv/          # Python virtual environment
-├── README.md
-└── .gitignore
+Femisync/
+│
+├── backend/
+├── frontend/
+├── .env.example
+└── README.md
 ```
 
 ---
 
-## Running the Frontend
+## Setup Instructions
+
+### Clone Repository
+
+```bash
+git clone https://github.com/yourusername/femisync.git
+cd femisync
+```
+
+---
+
+## Frontend Setup
 
 ```bash
 cd frontend
@@ -85,44 +85,95 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
-
+Frontend runs on:
 ```text
 http://localhost:5173
 ```
 
 ---
 
-## Running the Backend
+## Backend Setup
 
-Activate virtual environment:
-
-### Git Bash
+### Create Virtual Environment
 
 ```bash
-source venv/Scripts/activate
+cd backend
+python -m venv venv
 ```
 
-Run backend:
+### Activate Environment
+
+#### Windows
 
 ```bash
-uvicorn backend.main:app --reload
+venv\Scripts\activate
 ```
 
-Backend runs at:
+#### Mac/Linux
 
-```text
-http://127.0.0.1:8000
+```bash
+source venv/bin/activate
 ```
 
-API docs available at:
+### Install Dependencies
 
+```bash
+pip install -r requirements.txt
+```
+
+### Run Backend
+
+```bash
+uvicorn main:app --reload
+```
+
+Backend runs on:
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8000
 ```
 
 ---
 
-## Disclaimer
+## Environment Variables
 
-Femisync is not a medical diagnosis platform. It is designed for wellness tracking, pattern awareness, visualization, and educational insights only.
+Create a `.env` file using `.env.example`
+
+Example:
+
+```env
+GEMINI_API_KEY=your_api_key
+```
+
+---
+
+## API Data Model
+
+```python
+class WellnessCheckIn(BaseModel):
+    date: str
+
+    sleep_hours: float
+    stress_score: int
+    mood_score: int
+    energy_score: int
+    fatigue_score: int
+
+    period_status: Optional[bool] = False
+    flow_intensity: Optional[int] = 0
+    cycle_day: Optional[int] = 0
+    cramps_score: Optional[int] = 0
+
+    hot_flashes: Optional[int] = 0
+    night_sweats: Optional[int] = 0
+    sleep_disruption: Optional[int] = 0
+    brain_fog: Optional[int] = 0
+    mood_swings: Optional[int] = 0
+
+    notes: Optional[str] = ""
+```
+
+---
+
+## License
+
+Created for ALGOfest Hackathon 2026.
