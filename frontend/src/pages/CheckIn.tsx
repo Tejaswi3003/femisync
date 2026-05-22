@@ -2,6 +2,7 @@ import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../App.css";
+import { submitCheckIn } from "../api/api";
 
 type Props = {
   trackingMode: string;
@@ -91,18 +92,11 @@ function CheckIn({ trackingMode, onBack }: Props) {
     console.log("Check-in submitted:", checkInData);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/checkin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(checkInData),
-      });
-
-      if (!response.ok) throw new Error();
-
+      const result = await submitCheckIn(checkInData);
+      console.log("Backend response:", result);
       setSubmitted(true);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Could not connect to backend. Please make sure FastAPI is running.");
     }
   };
@@ -173,8 +167,8 @@ function CheckIn({ trackingMode, onBack }: Props) {
               />
             </div>
 
-            <SliderBlock icon="☺" label="Mood Score" value={mood} setValue={setMood} />
-            <SliderBlock icon="☹" label="Stress Score" value={stress} setValue={setStress} />
+            <SliderBlock icon="🪷" label="Mood Score" value={mood} setValue={setMood} />
+            <SliderBlock icon="🍵" label="Stress Score" value={stress} setValue={setStress} />
 
             <div className="metric-block">
               <div className="metric-label">
@@ -195,7 +189,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
             </div>
 
             <SliderBlock icon="⚡" label="Energy Score" value={energy} setValue={setEnergy} />
-            <SliderBlock icon="☁" label="Fatigue Score" value={fatigue} setValue={setFatigue} />
+            <SliderBlock icon="☁️" label="Fatigue Score" value={fatigue} setValue={setFatigue} />
           </div>
 
           <div className="notes-area">
@@ -225,49 +219,29 @@ function CheckIn({ trackingMode, onBack }: Props) {
 
             <div className="wide-slider">
               <div
-  className={`period-toggle ${
-    periodStatus ? "active" : ""
-  }`}
-  onClick={() =>
-    setPeriodStatus(
-      !periodStatus
-    )
-  }
->
-  <div className="period-icon">
-  {periodStatus ? "🩸" : "🌿"}
-</div>
+                className={`period-toggle ${periodStatus ? "active" : ""}`}
+                onClick={() => setPeriodStatus(!periodStatus)}
+              >
+                <div className="period-icon">
+                  {periodStatus ? "🪷" : "✨"}
+                </div>
 
-  <div>
-    <div className="period-title">
-      Period Today
-    </div>
+                <div>
+                  <div className="period-title">Period Today</div>
+                  <div className="period-subtitle">
+                    {periodStatus ? "Tracking enabled" : "Tap to enable"}
+                  </div>
+                </div>
 
-    <div className="period-subtitle">
-      {
-        periodStatus
-          ? "Tracking enabled"
-          : "Tap to enable"
-      }
-    </div>
-  </div>
+                <div className="toggle-circle">{periodStatus ? "✓" : ""}</div>
+              </div>
 
-  <div className="toggle-circle">
-    {periodStatus
-      ? "✓"
-      : ""}
-  </div>
-</div>
-
-              <br />
-              <br />
-
-              <label>Cycle Day</label>
+              <label>Cycle Day (Day since period started)</label>
               <input
                 value={cycleDay}
                 type="number"
                 onChange={(e) => setCycleDay(e.target.value)}
-                placeholder="e.g. 2"
+                placeholder="Cycle day (Day 1, Day 2...)"
                 className="soft-input"
               />
 
@@ -303,7 +277,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
         {isMenopauseTracking && (
           <section className="horizontal-card lavender-card">
             <div className="card-title-block">
-              <span className="circle-icon">☀️</span>
+              <span className="circle-icon">🦋</span>
               <div>
                 <h2>Menopause Tracking</h2>
                 <p>Track menopause-related symptoms</p>
@@ -409,7 +383,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
                     ? "🔋"
                     : symptom === "Mood Swings"
                     ? "🎭"
-                    : "😮‍💨"}
+                    : "🌙"}
                 </span>
                 {symptom}
               </button>
@@ -430,7 +404,7 @@ function CheckIn({ trackingMode, onBack }: Props) {
         </button>
 
         <button className="back-button" onClick={onBack}>
-          ← Back to Onboarding
+          ← Back to DashBoard
         </button>
 
         <p className="footer-message">You&apos;re doing great! 💜</p>
